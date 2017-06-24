@@ -2,7 +2,7 @@
 
 Help Chat allows visitors of websites to communicate with the people behind the website. For example, a company could add Help Chat to their website to allow visitors to ask questions about their product.
 
-## Installation
+## Building the frontend
 This project's only requirement is Docker. You can install Docker [from their website](https://www.docker.com/).
 
 In order to build the frontend component, the `settings.json` file must first be filled out.
