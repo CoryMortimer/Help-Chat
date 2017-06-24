@@ -54,7 +54,7 @@
     </style>
   </head>
   <body>
-    
+
     <div style="position: fixed; bottom: 0; right: 0; margin: 0 10px 10px 0; z-index: 9999; height: 90%;">
       <div id="chat" class="hide" style="word-wrap: break-word; width: 300px; min-width: 200px; min-height: 100px; border: solid rgba(0,0,255,.3) 1px; position:relative; height: calc(100% - 60px);">
         <div style="background: rgba(73,175,255,.3); padding: 5px;">Chat</div>
@@ -73,19 +73,31 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script>
-      var socket = io("https://localhost:3000", {secure: true});
-      socket.on("message", function(data) {
-        HelpChat.addToChat(data.from, data.msg, false);
-      });
-    </script>
-    <script>
       var HelpChat = (function() {
         var helpChat = {
           closed: true,
           unopenedChats: 0
         };
+        var socketConnectionOpen = false;
+        var socket;
+        function openSocketServer() {
+          if (socketConnectionOpen) {return;}
+          socketConnectionOpen = true;
+          socket = io("<SOCKET_SERVER_URL>", {secure: true});
+          socket.on("message", function(data) {
+            HelpChat.addToChat(data.from, data.msg, false);
+          });
+        }
+        var socketServerConnectionMethod = "<SOCKET_SERVER_CONNECTION_METHOD>"
+
+        if (socketServerConnectionMethod === "onArrival") {
+          openSocketServer();
+        }
 
         helpChat.toggleChat = function() {
+          if (socketServerConnectionMethod !== "onArrival") {
+            openSocketServer();
+          }
           var chatElement = document.getElementById("chat");
           var questionMark = document.getElementById("questionMark");
           var x = document.getElementById("X");
@@ -129,7 +141,6 @@
           var messageElement = document.createElement("div");
           messageElement.className = "message";
           messageElement.innerHTML = msg;
-          // chatItem.innerHTML = "<div class=\"name\">" + from + "</div> <div class=\"message\">" + msg + "</div>";
           chatItem.appendChild(fromElement);
           chatItem.appendChild(messageElement);
           var messages = document.getElementById("chatMessages");
