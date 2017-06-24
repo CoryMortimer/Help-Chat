@@ -1,5 +1,6 @@
 stop:
 	-docker stop chat-frontend-build-container
+	-docker rm chat-frontend-build-container
 
 build:
 	docker build -t chat-frontend-build .
