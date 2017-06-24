@@ -19,5 +19,5 @@ make run
 ```
 A folder named `dist` will be created in the root directory. Within the dist folder, you will find the `chat.min.js` file. Include this file on any webpage.
 
-## Runing the server
+## Running the server
 Coming soon
