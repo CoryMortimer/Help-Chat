@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      .hide {
+        display: none;
+      }
+      button {
+        cursor: pointer;
+      }
+      button.unread:after {
+        content: attr(data-unread);
+        background: red;
+        width: 25px;
+        height: 22px;
+        position: absolute;
+        font-size: 15px;
+        border-radius: 100%;
+        font-weight: bold;
+        top: -8px;
+        right: -8px;
+        padding-top: 3px;
+      }
+      button:focus {
+        outline: none;
+      }
+      input:focus {
+        outline: none;
+      }
+      form {
+        margin-bottom: 5px;
+      }
+      .message {
+        background: rgba(0,136,255,.1);
+        padding: 5px;
+        border: solid 1px rgba(0,0,0,.2);
+        display: inline-block;
+        word-wrap: break-word;
+        word-break: break-all;
+      }
+      .name {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      li {
+        padding-bottom: 10px;
+      }
+      .align-right {
+        text-align: right;
+      }
+      .align-right .message {
+        background: rgba(0,204,255,.2);
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div style="position: fixed; bottom: 0; right: 0; margin: 0 10px 10px 0; z-index: 9999; height: 90%;">
+      <div id="chat" class="hide" style="word-wrap: break-word; width: 300px; min-width: 200px; min-height: 100px; border: solid rgba(0,0,255,.3) 1px; position:relative; height: calc(100% - 60px);">
+        <div style="background: rgba(73,175,255,.3); padding: 5px;">Chat</div>
+        <div id="chatMessageContainer" style="height: calc(100% - 60px); overflow-y: auto; margin-bottom: 10px; background: rgba(220,220,220,.3);">
+          <ul id="chatMessages" style="list-style: none; margin: 0; padding: 10px;"></ul>
+        </div>
+        <form style="position: absolute; bottom: 0; width: 100%; background: white; padding: 5px 0 5px 0;" onsubmit="return HelpChat.sendChat()">
+          <input id="message" type="text" name="text" placeholder="Type message..." style="margin-left: 5px; width: calc(100% - 60px); border: none; border-bottom: solid 2px; border-bottom-style: inset;">
+          <button type="submit">Send</button>
+        </form>
+      </div>
+      <button id="openChatButton" onclick="HelpChat.toggleChat()" style="background: blue; color: white; width: 50px; height: 50px; border-radius: 100%; text-align: center; font-size: 35px; float: right; position: fixed; bottom: 0; right: 0; margin: 0 10px 10px 0;">
+        <span id="questionMark">?</span>
+        <span id="X" class="hide">X</span>
+      </button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script>
+      var socket = io("https://localhost:3000", {secure: true});
+      socket.on("message", function(data) {
+        HelpChat.addToChat(data.from, data.msg, false);
+      });
+    </script>
+    <script>
+      var HelpChat = (function() {
+        var helpChat = {
+          closed: true,
+          unopenedChats: 0
+        };
+
+        helpChat.toggleChat = function() {
+          var chatElement = document.getElementById("chat");
+          var questionMark = document.getElementById("questionMark");
+          var x = document.getElementById("X");
+          var values = chatElement.classList.value.split(" ");
+          if (values.indexOf("hide") > -1) {
+            helpChat.closed = false;
+            resetUnopenedChatCounter()
+            chatElement.className = "";
+            x.className = "";
+            questionMark.className = "hide";
+            scrollToMostRecentMessage()
+          } else {
+            helpChat.closed = true;
+            chatElement.className = "hide";
+            x.className = "hide";
+            questionMark.className = "";
+          }
+        }
+
+        function scrollToMostRecentMessage() {
+          var chatMessageContainer = document.getElementById("chatMessageContainer");
+          chatMessageContainer.scrollTop = chatMessageContainer.scrollHeight;
+        }
+
+        function resetUnopenedChatCounter(button) {
+          var openChatButton = button || document.getElementById("openChatButton")
+          openChatButton.className = ""
+          helpChat.unopenedChats = 0
+          openChatButton.dataset.unread = helpChat.unopenedChats
+        }
+
+        helpChat.addToChat = function(from, msg, isUserMessage) {
+          var chatItem = document.createElement("li");
+          if (!isUserMessage) {
+            chatItem.className = "align-right";
+            helpChat.unopenedChats = helpChat.closed ? helpChat.unopenedChats + 1 : 0;
+          }
+          var fromElement = document.createElement("div");
+          fromElement.className = "name";
+          fromElement.innerHTML = from;
+          var messageElement = document.createElement("div");
+          messageElement.className = "message";
+          messageElement.innerHTML = msg;
+          // chatItem.innerHTML = "<div class=\"name\">" + from + "</div> <div class=\"message\">" + msg + "</div>";
+          chatItem.appendChild(fromElement);
+          chatItem.appendChild(messageElement);
+          var messages = document.getElementById("chatMessages");
+          messages.appendChild(chatItem);
+          scrollToMostRecentMessage()
+          var openChatButton = document.getElementById("openChatButton")
+          if (helpChat.unopenedChats) {
+            openChatButton.className = "unread"
+            openChatButton.dataset.unread = helpChat.unopenedChats
+          } else {
+            resetUnopenedChatCounter(openChatButton)
+          }
+        }
+
+        helpChat.sendChat = function() {
+          var messageInput = document.getElementById("message");
+          socket.emit("message", messageInput.value)
+          helpChat.addToChat("Me", messageInput.value, true);
+          messageInput.value = "";
+          return false;
+        }
+
+        return helpChat;
+      })();
+    </script>
+  </body>
+</html>
+

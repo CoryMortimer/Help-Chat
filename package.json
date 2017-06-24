@@ -1,0 +1,18 @@
+{
+  "name": "help-chat",
+  "version": "1.0.0",
+  "description": "Customer service chat application for websites",
+  "scripts": {
+    "start": "make run"
+  },
+  "author": "Cory Mortimer",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^0.4.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-htmlmin": "^2.4.0",
+    "grunt-contrib-uglify": "^3.0.1",
+    "grunt-insert": "^0.1.0",
+    "grunt-minify-html": "^3.0.0"
+  }
+}
