@@ -77,6 +77,7 @@ The following http endpoints are available over the 3000 port with valid authent
 Coming soon
 
 ## Todo
+- [ ] Make database persistent
 - [ ] Make frontend client
 - [ ] Example with a proxy served over https
 - [ ] Better authentication
