@@ -1,0 +1,7 @@
+<input type="checkbox" [checked]="activeChats" (change)="activeChats = !activeChats"> Connected Chats Only
+<div>Connected chats: {{connectedChats}}</div>
+<div>Connected responding clients: {{connectedRespondingClients}}</div>
+<div *ngIf="!chats.length">No <span *ngIf="activeChats">active</span> chats</div>
+<ul>
+  <li *ngFor="let chat of chats"><a routerLink="/chats/{{chat.id}}">{{chat.id}}</a> <span *ngIf="chat.newMessages">{{chat.newMessages}}</span></li>
+</ul>

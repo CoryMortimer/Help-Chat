@@ -1,0 +1,21 @@
+<form [formGroup]="chatForm" (ngSubmit)="onSubmit()">
+  <label for="name">Name:
+    <input type="input" formControlName="name">
+  </label>
+  <div>
+    <ul>
+      <li *ngFor="let msg of messages">
+        <div>
+          Name: {{msg.speaker}}
+        </div>
+        <div>
+          Message: {{msg.message}}
+        </div>
+      </li>
+    </ul>
+  </div>
+  <label for="message">Message:
+    <textarea formControlName="message"></textarea>
+  </label>
+  <button type="submit">Send</button>
+</form>

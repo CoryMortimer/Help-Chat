@@ -1,0 +1,8 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+  <input type="text" formControlName="key">
+  <input type="password" formControlName="secret">
+  <button type="submit">Login</button>
+</form>
+<div *ngIf="error">
+  {{error}}
+</div>
