@@ -24,3 +24,28 @@ build-server:
 
 run: stop-server build-server
 	docker run -ti -p 3000:3000 -p 3001:3001 --name server server-image
+
+########## Frontend-client ##########
+
+stop-responding:
+	-docker stop responding-client
+	-docker rm responding-client
+
+build-responding:
+	docker build -t responding-client-image responding-client/
+
+dev: stop-responding build-responding
+	-docker network create help-chat
+	docker run -ti -p 4200:4200 --network help-chat --name responding-client -v $(shell pwd)/responding-client/src:/usr/src responding-client-image ng serve --host 0.0.0.0 --proxy-config proxy.conf.json
+
+########## Whole system ##########
+
+down:
+	docker-compose down
+
+up: down stop-responding build-responding
+	-docker network create help-chat
+	docker create --name responding-client responding-client-image
+	docker cp responding-client:/usr/dist proxy
+	-docker rm responding-client
+	docker-compose up -d --build

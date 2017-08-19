@@ -44,8 +44,12 @@ module.exports = function(grunt) {
         options: {
           replacements: [
             {
-              pattern: '<SOCKET_SERVER_URL>',
-              replacement: '<%= serverUrl %>'
+              pattern: '<SOCKET_SERVER_DOMAIN>',
+              replacement: '<%= serverDomain %>'
+            },
+            {
+              pattern: '<SOCKET_SERVER_PATH>',
+              replacement: '<%= serverPath %>'
             },
             {
               pattern: '<SOCKET_SERVER_CONNECTION_METHOD>',
@@ -58,7 +62,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('loadconfig', 'Load configuration from settings.json', function() {
-    grunt.config('serverUrl', process.env.serverUrl);
+    grunt.config('serverDomain', process.env.serverDomain);
+    grunt.config('serverPath', process.env.serverPath);
     grunt.config('socketConnectionStrategy', process.env.socketConnectionStrategy);
     console.log('process.env.serverUrl',process.env.serverUrl)
     console.log('process.env.socketConnectionStrategy',process.env.socketConnectionStrategy)

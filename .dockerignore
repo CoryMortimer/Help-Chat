@@ -1,4 +1,6 @@
 node_modules
 server
-dest
+dist
 Makefile
+responding-client
+proxy

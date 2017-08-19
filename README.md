@@ -56,7 +56,8 @@ The websocket on port 3001 gives information about users on the chat. Users must
   - connectedToChat: The number of chat clients connected to the server
 - message: A JSON object that is a message from a chat client
   - from: The socket ID in which the message is from
-  - msg: The message from the chat client
+  - msg: The message from a user of the chat
+  - id: The chat id
 - error: A string containing an error message (most likely because of invalid credentials)
 
 ### Endpoints

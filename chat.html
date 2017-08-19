@@ -83,7 +83,7 @@
         function openSocketServer() {
           if (socketConnectionOpen) {return;}
           socketConnectionOpen = true;
-          socket = io("<SOCKET_SERVER_URL>", {secure: true});
+          socket = io("<SOCKET_SERVER_DOMAIN>", {path: "<SOCKET_SERVER_PATH>", secure: true});
           socket.on("message", function(data) {
             HelpChat.addToChat(data.from, data.msg, false);
           });

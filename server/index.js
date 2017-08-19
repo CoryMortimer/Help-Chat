@@ -4,12 +4,13 @@ const http = require('http');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('chat.db');
 const httpServer = http.createServer(app);
-const io = require('socket.io')(httpServer);
+const io = require('socket.io')(httpServer, {path: '/socket/client'});
 const uuidv4 = require('uuid/v4');
 const atob = require('atob');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
-const respondingClientsSocket = require('socket.io').listen(3001);
+const respondingClientsSocket = require('socket.io')(3001, {path: '/socket/responding'});
+const API = '/api'
 
 let connectedChatSockets = {};
 let connectedRespondingClientSockets = {};
@@ -57,7 +58,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('message', function(msg) {
-    respondingClientsSocket.emit('message', {from: socket.id, msg: msg});
+    respondingClientsSocket.emit('message', {from: socket.id, msg: msg, id: socket.id});
     insertNewChat(socket.id, socket.id, msg);
   });
 });
@@ -134,7 +135,7 @@ function handleAuthorization(req, res, callback) {
     });
 }
 
-app.get('/chats', function (req, res) {
+app.get(API + '/chats', function (req, res) {
   handleAuthorization(req, res, function() {
     let query = req.query
     if (query && query.connected) {
@@ -152,7 +153,7 @@ app.get('/chats', function (req, res) {
   })
 })
 
-app.get('/chats/:id', function (req, res) {
+app.get(API + '/chats/:id', function (req, res) {
   handleAuthorization(req, res, function() {
     db.prepare('SELECT speaker, message FROM message WHERE chatid=? ORDER BY date(date)').all(req.params.id, function(err, rows) {
       if (err) {
@@ -168,7 +169,7 @@ app.get('/chats/:id', function (req, res) {
   })
 });
 
-app.post('/chats/:id', function (req, res) {
+app.post(API + '/chats/:id', function (req, res) {
   handleAuthorization(req, res, function() {
     let formatMsg = 'Request body must have name and message';
     let socket = connectedChatSockets[req.params.id];
@@ -180,6 +181,7 @@ app.post('/chats/:id', function (req, res) {
         if (name && message) {
           insertNewChat(socket.id, name, message);
           socket.emit('message', {from: name, msg: message});
+          respondingClientsSocket.emit('message', {from: name, msg: message, id: socket.id});
         } else {
           return errorResponse(res, 400, formatMsg);
         }
@@ -190,7 +192,7 @@ app.post('/chats/:id', function (req, res) {
       return errorResponse(res, 404, 'Chat does not exist or is not connected');
     }
     res.send();
-  })
+  });
 });
 
 httpServer.listen(3000, function () {
