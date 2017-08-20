@@ -23,7 +23,7 @@ build-server:
 	docker build -t server-image server
 
 run: stop-server build-server
-	docker run -ti -p 3000:3000 -p 3001:3001 --name server server-image
+	docker run -ti -p 3000:3000 -p 3001:3001 -v $(shell pwd)/server/database:/usr/src/app/database --name server server-image
 
 ########## Frontend-client ##########
 

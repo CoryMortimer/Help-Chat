@@ -109,7 +109,7 @@ make dev
 The development server has a proxy to the API server that is ran when the `make run` command is launched.
 
 ## Todo
-- [ ] Make database persistent
+- [X] Make database persistent
 - [X] Make frontend client
 - [ ] Example with a proxy served over https
 - [ ] Better authentication
