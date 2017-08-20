@@ -46,6 +46,7 @@ down:
 up: down stop-responding build-responding
 	-docker network create help-chat
 	docker create --name responding-client responding-client-image
+	-rm -rf proxy/dist
 	docker cp responding-client:/usr/dist proxy
 	-docker rm responding-client
 	docker-compose up -d --build
